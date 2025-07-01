@@ -5,6 +5,7 @@ from ..dependencies import SessionDep
 
 
 class QuizBase(SQLModel):
+    name: str
 
 
 class Quiz(QuizBase, table=True):
@@ -22,6 +23,7 @@ class QuizPublic(QuizBase):
 
 
 class QuizUpdate(QuizBase):
+    name: str
 
 
 class QuizCreate(QuizBase):
@@ -71,11 +73,12 @@ def update_quiz(id: int, quiz: QuizUpdate, session: SessionDep):
 
 @router.delete("/{id}")
 def delete_quiz(id: int, session: SessionDep):
-    quiz = session.get(Quiz, id)
-    if not quiz:
+    quiz_db = session.get(Quiz, id)
+    if not quiz_db:
         raise HTTPException(status_code=404, detail="Quiz not found")
 
-    session.delete(quiz)
+    quiz_db.enabled = False
+    session.add(quiz_db)
     session.commit()
 
     return {"ok": True}
