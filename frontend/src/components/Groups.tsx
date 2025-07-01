@@ -79,24 +79,11 @@ export function GroupItem({ group, selected, handleSelect }: GroupItemProps) {
 
 interface GroupListProps {
     groups: Group[];
+    selected: Set<number>;
+    handleSelect: (ids: number[]) => void;
 }
 
-export function GroupList({ groups }: GroupListProps) {
-    const [selected, setSelected] = useState<Set<number>>(() => new Set());
-
-    function handleSelect(ids: number[]) {
-        let newSelected = new Set(selected);
-        for (const id of ids) {
-            if (selected.has(id)) {
-                newSelected.delete(id);
-            } else {
-                newSelected.add(id);
-            }
-        }
-
-        setSelected(newSelected);
-    }
-
+export function GroupList({ groups, selected, handleSelect }: GroupListProps) {
     return (
         <ul className="GroupList">
             {
