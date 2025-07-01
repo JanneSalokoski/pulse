@@ -1,5 +1,8 @@
+import hashlib
+
 from fastapi import APIRouter, HTTPException
 from sqlmodel import Field, SQLModel, select
+from datetime import datetime
 
 from ..dependencies import SessionDep
 
@@ -9,7 +12,7 @@ class QuizBase(SQLModel):
 
 
 class Quiz(QuizBase, table=True):
-    id: int = Field(index=True, primary_key=True)
+    id: int | None = Field(index=True, primary_key=True)
     slug: str = Field(index=True)
     created_at: str
     enabled: bool
@@ -50,7 +53,12 @@ async def get_quiz(id: int, session: SessionDep):
 
 @router.post("/", response_model=QuizPublic)
 async def create_quiz(quiz: QuizCreate, session: SessionDep):
-    db_quiz = Quiz.model_validate(quiz)
+    slug: str = hashlib.md5(quiz.name.encode()).hexdigest()[:8]
+    created_at = datetime.now().isoformat()
+
+    db_quiz = Quiz(
+        id=None, name=quiz.name, slug=slug, created_at=created_at, enabled=True
+    )
     session.add(db_quiz)
     session.commit()
     session.refresh(db_quiz)
