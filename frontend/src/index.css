@@ -12,3 +12,18 @@ body {
     font-size: 14pt;
     line-height: 150%;
 }
+
+input {
+    background-color: #121223;
+    color: #eee;
+    padding: 0.5rem;
+
+    border: 1px solid #777;
+    border-radius: 4px;
+
+    display: inline-block;
+}
+
+input:disabled {
+    color: #777;
+}

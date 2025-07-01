@@ -1,0 +1,29 @@
+.GroupList {
+    display: grid;
+    grid-template-columns: 2rem auto;
+    grid-template-rows: 2rem auto;
+
+    padding: var(--gap);
+}
+
+.GroupList.closed {
+    grid-template-rows: 2rem;
+}
+
+.GroupItem {
+    display: contents;
+}
+
+.QuestionList {
+    display: grid;
+    grid-template-columns: 2rem auto;
+    grid-template-rows: 2rem;
+
+    padding: var(--gap);
+
+    grid-column: 1 / span 2;
+}
+
+.QuestionItem {
+    display: contents;
+}
