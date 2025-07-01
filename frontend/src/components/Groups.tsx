@@ -47,11 +47,26 @@ export function GroupItem({ group, selected, handleSelect }: GroupItemProps) {
         setOpen(!open);
     }
 
+    const question_ids = group.questions.map(q => q.id);
+    const checked: boolean = (question_ids.every(id => selected.has(id)))
+
+    function handleToggle() {
+        if (checked) {
+            handleSelect(question_ids);
+        }
+        else {
+            const missing = question_ids.filter(id => !(selected.has(id)));
+            handleSelect(missing);
+        }
+    }
+
     return (
         <li className={`GroupItem ${open ? "open" : "closed"}`}
             key={group.slug}
         >
-            <div className="selected"><input type="checkbox" /></div>
+            <div className="selected">
+                <input type="checkbox" checked={checked} onChange={handleToggle} />
+            </div>
             <div className="name"
                 onClick={() => toggleOpen()}
             >{group.name}</div>
@@ -80,7 +95,6 @@ export function GroupList({ groups }: GroupListProps) {
         }
 
         setSelected(newSelected);
-        console.log(newSelected);
     }
 
     return (
