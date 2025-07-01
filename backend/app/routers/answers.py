@@ -1,4 +1,4 @@
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from fastapi import APIRouter, HTTPException
 from sqlmodel import Field, Relationship, SQLModel, select
 

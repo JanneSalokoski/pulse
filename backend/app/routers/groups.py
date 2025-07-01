@@ -1,5 +1,4 @@
 import hashlib
-from typing import TYPE_CHECKING
 
 from fastapi import APIRouter, HTTPException
 from sqlmodel import Field, Relationship, SQLModel, select

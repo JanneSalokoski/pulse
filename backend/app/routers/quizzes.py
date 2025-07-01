@@ -7,11 +7,11 @@ from datetime import datetime
 
 from ..dependencies import SessionDep
 
-from .questions import Question, QuestionPublic, QuestionWithAnswers
+from .questions import Question, QuestionWithAnswers
 from .quiz_question_link import QuizQuestionLink
 
 if TYPE_CHECKING:
-    from .answers import Answers
+    from .answers import Answer
 
 
 class QuizBase(SQLModel):
