@@ -1,0 +1,9 @@
+.App {
+    width: 100vw;
+    height: 100vh;
+
+    padding: var(--gap);
+
+    background-color: #222233;
+    color: #ddd;
+}
