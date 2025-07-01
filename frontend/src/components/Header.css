@@ -1,0 +1,23 @@
+.Header {
+    display: flex;
+    gap: var(--gap);
+
+    justify-content: center;
+
+    font-size: 2rem;
+
+    * {
+        display: inline;
+    }
+
+    h1,
+    h2 {
+        color: inherit;
+        font-size: inherit;
+    }
+
+    a {
+        color: inherit;
+        text-decoration: none;
+    }
+}
