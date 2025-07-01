@@ -5,12 +5,14 @@ import { useState } from "react";
 
 interface QuestionItemProps {
     question: Question;
+    selected: boolean;
+    handleSelect: (ids: number[]) => void;
 }
 
-export function QuestionItem({ question }: QuestionItemProps) {
+export function QuestionItem({ question, selected, handleSelect }: QuestionItemProps) {
     return (
         <li className="QuestionItem">
-            <input type="checkbox" />
+            <div className="selected"><input type="checkbox" checked={selected} onChange={() => handleSelect([question.id])} /></div>
             <span className="text">{question.text}</span>
         </li>
     )
@@ -18,13 +20,15 @@ export function QuestionItem({ question }: QuestionItemProps) {
 
 interface QuestionListProps {
     questions: Question[];
+    selected: Set<number>;
+    handleSelect: (ids: number[]) => void;
 }
 
-export function QuestionList({ questions }: QuestionListProps) {
+export function QuestionList({ questions, selected, handleSelect }: QuestionListProps) {
     return (
         <ul className="QuestionList">
             {
-                questions.map((question: Question) => <QuestionItem question={question} />)
+                questions.map((question: Question) => <QuestionItem key={question.id} question={question} selected={selected.has(question.id)} handleSelect={handleSelect} />)
             }
         </ul>
     )
@@ -32,9 +36,11 @@ export function QuestionList({ questions }: QuestionListProps) {
 
 interface GroupItemProps {
     group: Group;
+    selected: Set<number>;
+    handleSelect: (ids: number[]) => void;
 }
 
-export function GroupItem({ group }: GroupItemProps) {
+export function GroupItem({ group, selected, handleSelect }: GroupItemProps) {
     const [open, setOpen] = useState<boolean>(true);
 
     function toggleOpen() {
@@ -44,14 +50,15 @@ export function GroupItem({ group }: GroupItemProps) {
     return (
         <li className={`GroupItem ${open ? "open" : "closed"}`}
             key={group.slug}
-            onClick={() => toggleOpen()}
         >
             <div className="selected"><input type="checkbox" /></div>
-            <div className="name">{group.name}</div>
+            <div className="name"
+                onClick={() => toggleOpen()}
+            >{group.name}</div>
             {
-                open && <QuestionList questions={group.questions} />
+                open && <QuestionList questions={group.questions} selected={selected} handleSelect={handleSelect} />
             }
-        </li>
+        </li >
     )
 }
 
@@ -60,11 +67,26 @@ interface GroupListProps {
 }
 
 export function GroupList({ groups }: GroupListProps) {
-    console.log(groups);
+    const [selected, setSelected] = useState<Set<number>>(() => new Set());
+
+    function handleSelect(ids: number[]) {
+        let newSelected = new Set(selected);
+        for (const id of ids) {
+            if (selected.has(id)) {
+                newSelected.delete(id);
+            } else {
+                newSelected.add(id);
+            }
+        }
+
+        setSelected(newSelected);
+        console.log(newSelected);
+    }
+
     return (
         <ul className="GroupList">
             {
-                groups.map((group: Group) => <GroupItem group={group} />)
+                groups.map((group: Group) => <GroupItem key={group.slug} group={group} selected={selected} handleSelect={handleSelect} />)
             }
         </ul>
     )
