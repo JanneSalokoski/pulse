@@ -1,9 +1,12 @@
 .App {
-    width: 100vw;
-    height: 100vh;
-
+    width: calc(100vw - 2*(var(--gap)));
+    height: calc(100vh - 2*(var(--gap)));
     padding: var(--gap);
 
     background-color: #222233;
     color: #ddd;
+
+    display: grid;
+    grid-template-rows: 2rem auto;
+    gap: var(--gap);
 }
