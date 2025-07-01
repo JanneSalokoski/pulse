@@ -5,6 +5,7 @@ from sqlmodel import Field, Relationship, SQLModel, select
 from ..dependencies import SessionDep
 
 from .quiz_question_link import QuizQuestionLink
+from .answers import Answer, AnswerPublic
 
 if TYPE_CHECKING:
     from .groups import Group
@@ -26,10 +27,18 @@ class Question(QuestionBase, table=True):
         back_populates="questions", link_model=QuizQuestionLink
     )
 
+    answers: list["Answer"] = Relationship(back_populates="question")
+
 
 class QuestionPublic(QuestionBase):
     id: int
     text: str
+
+
+class QuestionWithAnswers(QuestionBase):
+    id: int
+    text: str
+    answers: list["AnswerPublic"]
 
 
 class QuestionUpdate(QuestionBase):
@@ -99,3 +108,4 @@ def delete_question(id: int, session: SessionDep):
 
 
 _ = Question.model_rebuild()
+_ = QuestionWithAnswers.model_rebuild()

@@ -7,8 +7,11 @@ from datetime import datetime
 
 from ..dependencies import SessionDep
 
-from .questions import Question, QuestionPublic
+from .questions import Question, QuestionPublic, QuestionWithAnswers
 from .quiz_question_link import QuizQuestionLink
+
+if TYPE_CHECKING:
+    from .answers import Answers
 
 
 class QuizBase(SQLModel):
@@ -25,12 +28,14 @@ class Quiz(QuizBase, table=True):
         back_populates="quizzes", link_model=QuizQuestionLink
     )
 
+    answers: list["Answer"] = Relationship(back_populates="quiz")
+
 
 class QuizPublic(QuizBase):
     name: str
     slug: str
     created_at: str
-    questions: list["QuestionPublic"]
+    questions: list["QuestionWithAnswers"]
 
 
 class QuizUpdate(QuizBase):
