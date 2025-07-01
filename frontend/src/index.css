@@ -23,3 +23,7 @@ input {
 
     display: inline-block;
 }
+
+input:disabled {
+    color: #777;
+}
