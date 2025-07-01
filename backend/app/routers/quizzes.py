@@ -1,10 +1,14 @@
 import hashlib
+from typing import TYPE_CHECKING
 
 from fastapi import APIRouter, HTTPException
-from sqlmodel import Field, SQLModel, select
+from sqlmodel import Field, Relationship, SQLModel, select
 from datetime import datetime
 
 from ..dependencies import SessionDep
+
+from .questions import Question, QuestionPublic
+from .quiz_question_link import QuizQuestionLink
 
 
 class QuizBase(SQLModel):
@@ -17,11 +21,16 @@ class Quiz(QuizBase, table=True):
     created_at: str
     enabled: bool
 
+    questions: list["Question"] = Relationship(
+        back_populates="quizzes", link_model=QuizQuestionLink
+    )
+
 
 class QuizPublic(QuizBase):
     name: str
     slug: str
     created_at: str
+    questions: list["QuestionPublic"]
 
 
 class QuizUpdate(QuizBase):
@@ -29,7 +38,8 @@ class QuizUpdate(QuizBase):
 
 
 class QuizCreate(QuizBase):
-    pass
+    name: str
+    questions: list[int]
 
 
 router = APIRouter(prefix="/quizzes", tags=["quizzes"])
@@ -61,9 +71,19 @@ async def create_quiz(quiz: QuizCreate, session: SessionDep):
     db_quiz = Quiz(
         id=None, name=quiz.name, slug=slug, created_at=created_at, enabled=True
     )
+
     session.add(db_quiz)
     session.commit()
     session.refresh(db_quiz)
+
+    if not db_quiz.id:
+        raise HTTPException(status_code=500, detail="Could not create quizz")
+
+    for qid in quiz.questions:
+        link = QuizQuestionLink(quiz_id=db_quiz.id, question_id=qid)
+        session.add(link)
+
+    session.commit()
 
     return db_quiz
 
@@ -97,3 +117,7 @@ def delete_quiz(slug: str, session: SessionDep):
     session.commit()
 
     return {"ok": True}
+
+
+_ = QuizPublic.model_rebuild()
+_ = Quiz.model_rebuild()

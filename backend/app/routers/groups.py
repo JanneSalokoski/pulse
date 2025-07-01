@@ -7,8 +7,7 @@ from datetime import datetime
 
 from ..dependencies import SessionDep
 
-if TYPE_CHECKING:
-    from .questions import Question
+from .questions import Question
 
 
 class GroupBase(SQLModel):
@@ -29,6 +28,8 @@ class GroupPublic(GroupBase):
     name: str
     slug: str
     created_at: str
+
+    questions: list["Question"]
 
 
 class GroupUpdate(GroupBase):
@@ -104,3 +105,7 @@ def delete_group(slug: str, session: SessionDep):
     session.commit()
 
     return {"ok": True}
+
+
+_ = Group.model_rebuild()
+_ = GroupPublic.model_rebuild()

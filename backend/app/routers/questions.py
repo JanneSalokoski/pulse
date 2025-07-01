@@ -4,8 +4,11 @@ from sqlmodel import Field, Relationship, SQLModel, select
 
 from ..dependencies import SessionDep
 
+from .quiz_question_link import QuizQuestionLink
+
 if TYPE_CHECKING:
     from .groups import Group
+    from .quizzes import Quiz
 
 
 class QuestionBase(SQLModel):
@@ -19,8 +22,13 @@ class Question(QuestionBase, table=True):
     group_id: int = Field(foreign_key="group.id")
     group: Optional["Group"] = Relationship(back_populates="questions")
 
+    quizzes: list["Quiz"] = Relationship(
+        back_populates="questions", link_model=QuizQuestionLink
+    )
+
 
 class QuestionPublic(QuestionBase):
+    id: int
     text: str
 
 
@@ -88,3 +96,6 @@ def delete_question(id: int, session: SessionDep):
     session.commit()
 
     return {"ok": True}
+
+
+_ = Question.model_rebuild()
