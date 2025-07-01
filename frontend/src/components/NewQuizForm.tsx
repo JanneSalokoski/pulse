@@ -7,6 +7,7 @@ import type { CreateQuiz, Group, Quiz } from "@api/types";
 
 import "./NewQuizForm.css";
 import { createQuiz } from "@api/quizzes";
+import { useNavigate } from "react-router-dom";
 
 interface NewQuizFormProps {
     groups: Group[];
@@ -29,6 +30,7 @@ export function NewQuizForm({ groups }: NewQuizFormProps) {
         setSelected(newSelected);
     }
 
+    const navigate = useNavigate();
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -36,7 +38,8 @@ export function NewQuizForm({ groups }: NewQuizFormProps) {
             const payload: CreateQuiz = { name: quizTitle, questions: [...selected] };
 
             const res: Quiz = await createQuiz(payload);
-            console.log(res);
+            console.log(`/q/${res.slug}`);
+            navigate(`/q/${res.slug}`);
         }
     }
 
