@@ -1,0 +1,15 @@
+.NewQuizForm {
+    input {
+        font-size: 0.975rem;
+    }
+
+    label {
+        display: flex;
+        width: 80%;
+        flex-direction: column;
+    }
+
+    span.label {
+        font-size: 0.9rem;
+    }
+}
