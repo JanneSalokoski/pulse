@@ -6,6 +6,10 @@
     padding: var(--gap);
 }
 
+.GroupList.closed {
+    grid-template-rows: 2rem;
+}
+
 .GroupItem {
     display: contents;
 }

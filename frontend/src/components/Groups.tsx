@@ -1,6 +1,7 @@
 import type { Group, Question } from "@api/types";
 
 import "./Groups.css";
+import { useState } from "react";
 
 interface QuestionItemProps {
     question: Question;
@@ -34,11 +35,22 @@ interface GroupItemProps {
 }
 
 export function GroupItem({ group }: GroupItemProps) {
+    const [open, setOpen] = useState<boolean>(true);
+
+    function toggleOpen() {
+        setOpen(!open);
+    }
+
     return (
-        <li className="GroupItem" key={group.slug}>
+        <li className={`GroupItem ${open ? "open" : "closed"}`}
+            key={group.slug}
+            onClick={() => toggleOpen()}
+        >
             <div className="selected"><input type="checkbox" /></div>
             <div className="name">{group.name}</div>
-            <QuestionList questions={group.questions} />
+            {
+                open && <QuestionList questions={group.questions} />
+            }
         </li>
     )
 }
