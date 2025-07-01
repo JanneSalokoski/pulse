@@ -1,4 +1,4 @@
-.App {
+.Page {
     width: calc(100vw - 2*(var(--gap)));
     height: calc(100vh - 2*(var(--gap)));
     padding: var(--gap);

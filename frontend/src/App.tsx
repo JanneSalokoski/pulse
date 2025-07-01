@@ -1,26 +1,23 @@
+import { Home } from '@pages/Home';
+import { QuizPage } from '@pages/Quiz';
+
 import './App.css'
 
-import { Header } from '@components/Header';
-import { NewQuizForm } from '@components/NewQuizForm';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
-import { getGroups } from '@api/groups';
-import type { Group } from '@api/types';
-
-import { useEffect, useState } from 'react';
+const router = createBrowserRouter([
+    {
+        path: '/',
+        element: <Home />,
+    },
+    {
+        path: '/q/:slug',
+        element: <QuizPage />
+    }
+])
 
 function App() {
-    const [groups, setGroups] = useState<Group[]>([]);
-
-    useEffect(() => {
-        getGroups().then(setGroups)
-    }, [])
-
-    return (
-        <div className="App">
-            <Header pageTitle="" />
-            <NewQuizForm groups={groups} />
-        </div>
-    )
+    return <RouterProvider router={router} />;
 }
 
 export default App
