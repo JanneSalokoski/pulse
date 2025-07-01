@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
-from sqlmodel import Field, Session, SQLModel, create_engine, select
+from sqlmodel import Field, SQLModel, select
 
-from app.dependencies import SessionDep
+from ..dependencies import SessionDep
 
 
 class QuizBase(SQLModel):
