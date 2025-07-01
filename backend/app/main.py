@@ -11,7 +11,7 @@ async def lifespan(_: FastAPI):
     yield
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(lifespan=lifespan, root_path="/api")
 
 app.include_router(quizzes.router)
 app.include_router(questions.router)
