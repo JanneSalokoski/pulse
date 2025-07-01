@@ -22,7 +22,6 @@ class QuizPublic(QuizBase):
     name: str
     slug: str
     created_at: str
-    enabled: bool
 
 
 class QuizUpdate(QuizBase):
@@ -38,13 +37,16 @@ router = APIRouter(prefix="/quizzes", tags=["quizzes"])
 
 @router.get("", response_model=list[QuizPublic])
 async def list_quizzes(session: SessionDep):
-    res = session.exec(select(Quiz)).all()
+    res = session.exec(select(Quiz).where(Quiz.enabled)).all()
     return res
 
 
-@router.get("/{id}")
-async def get_quiz(id: int, session: SessionDep):
-    res = session.get(Quiz, id)
+@router.get("/{slug}", response_model=QuizPublic)
+async def get_quiz(slug: str, session: SessionDep):
+    res: Quiz | None = session.exec(
+        select(Quiz).where(Quiz.enabled and Quiz.slug == slug)
+    ).one_or_none()
+
     if not res:
         raise HTTPException(status_code=404, detail="Quiz not found")
 
@@ -66,9 +68,11 @@ async def create_quiz(quiz: QuizCreate, session: SessionDep):
     return db_quiz
 
 
-@router.patch("/{id}", response_model=QuizPublic)
-def update_quiz(id: int, quiz: QuizUpdate, session: SessionDep):
-    quiz_db = session.get(Quiz, id)
+@router.patch("/{slug}", response_model=QuizPublic)
+def update_quiz(slug: str, quiz: QuizUpdate, session: SessionDep):
+    quiz_db: Quiz | None = session.exec(
+        select(Quiz).where(Quiz.enabled and Quiz.slug == slug)
+    ).one_or_none()
     if not quiz_db:
         raise HTTPException(status_code=404, detail="Quiz not found")
 
@@ -79,9 +83,12 @@ def update_quiz(id: int, quiz: QuizUpdate, session: SessionDep):
     session.refresh(quiz_db)
 
 
-@router.delete("/{id}")
-def delete_quiz(id: int, session: SessionDep):
-    quiz_db = session.get(Quiz, id)
+@router.delete("/{slug}")
+def delete_quiz(slug: str, session: SessionDep):
+    quiz_db: Quiz | None = session.exec(
+        select(Quiz).where(Quiz.enabled and Quiz.slug == slug)
+    ).one_or_none()
+
     if not quiz_db:
         raise HTTPException(status_code=404, detail="Quiz not found")
 
