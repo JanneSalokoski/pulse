@@ -5,7 +5,6 @@ from ..dependencies import SessionDep
 
 
 class QuizBase(SQLModel):
-    pass
 
 
 class Quiz(QuizBase, table=True):
@@ -16,13 +15,13 @@ class Quiz(QuizBase, table=True):
 
 
 class QuizPublic(QuizBase):
+    name: str
     slug: str
     created_at: str
     enabled: bool
 
 
 class QuizUpdate(QuizBase):
-    enabled: bool
 
 
 class QuizCreate(QuizBase):
