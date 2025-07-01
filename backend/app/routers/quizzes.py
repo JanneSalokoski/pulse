@@ -1,0 +1,99 @@
+import hashlib
+
+from fastapi import APIRouter, HTTPException
+from sqlmodel import Field, SQLModel, select
+from datetime import datetime
+
+from ..dependencies import SessionDep
+
+
+class QuizBase(SQLModel):
+    name: str
+
+
+class Quiz(QuizBase, table=True):
+    id: int | None = Field(index=True, primary_key=True)
+    slug: str = Field(index=True)
+    created_at: str
+    enabled: bool
+
+
+class QuizPublic(QuizBase):
+    name: str
+    slug: str
+    created_at: str
+
+
+class QuizUpdate(QuizBase):
+    name: str
+
+
+class QuizCreate(QuizBase):
+    pass
+
+
+router = APIRouter(prefix="/quizzes", tags=["quizzes"])
+
+
+@router.get("", response_model=list[QuizPublic])
+async def list_quizzes(session: SessionDep):
+    res = session.exec(select(Quiz).where(Quiz.enabled)).all()
+    return res
+
+
+@router.get("/{slug}", response_model=QuizPublic)
+async def get_quiz(slug: str, session: SessionDep):
+    res: Quiz | None = session.exec(
+        select(Quiz).where(Quiz.enabled and Quiz.slug == slug)
+    ).one_or_none()
+
+    if not res:
+        raise HTTPException(status_code=404, detail="Quiz not found")
+
+    return res
+
+
+@router.post("/", response_model=QuizPublic)
+async def create_quiz(quiz: QuizCreate, session: SessionDep):
+    slug: str = hashlib.md5(quiz.name.encode()).hexdigest()[:8]
+    created_at = datetime.now().isoformat()
+
+    db_quiz = Quiz(
+        id=None, name=quiz.name, slug=slug, created_at=created_at, enabled=True
+    )
+    session.add(db_quiz)
+    session.commit()
+    session.refresh(db_quiz)
+
+    return db_quiz
+
+
+@router.patch("/{slug}", response_model=QuizPublic)
+def update_quiz(slug: str, quiz: QuizUpdate, session: SessionDep):
+    quiz_db: Quiz | None = session.exec(
+        select(Quiz).where(Quiz.enabled and Quiz.slug == slug)
+    ).one_or_none()
+    if not quiz_db:
+        raise HTTPException(status_code=404, detail="Quiz not found")
+
+    quiz_data = quiz.model_dump(exclude_unset=True)
+    _ = quiz_db.sqlmodel_update(quiz_data)
+    session.add(quiz_db)
+    session.commit()
+    session.refresh(quiz_db)
+
+
+@router.delete("/{slug}")
+def delete_quiz(slug: str, session: SessionDep):
+    quiz_db: Quiz | None = session.exec(
+        select(Quiz).where(Quiz.enabled and Quiz.slug == slug)
+    ).one_or_none()
+
+    if not quiz_db:
+        raise HTTPException(status_code=404, detail="Quiz not found")
+
+    quiz_db.enabled = False
+    session.add(quiz_db)
+    session.commit()
+
+    return {"ok": True}
