@@ -59,16 +59,31 @@ export function QuizItem({ quiz }: QuizProps) {
         setSelections(newSelections);
     }
 
+    function handleSubmit(event: React.FormEvent) {
+        event.preventDefault();
+    }
+
     return (
-        <div className="Quiz">
-            <h2>{quiz.name}</h2>
+        <form className="Quiz" onSubmit={handleSubmit}>
             <a href={`/q/${quiz.slug}`}><h3>{`/q/${quiz.slug}`}</h3></a>
+            <p className="participants">
+                <span>There are 5 participants here.</span>
+            </p>
             <div className="questions">
+                <h3>Questions:</h3>
                 {
                     quiz?.questions?.map((q: Question) => <QuestionItem question={q} handleSelect={handleSelection} selected={selections.get(q.id)} />)
                 }
             </div>
-
-        </div>
+            <input type="submit" value="Send answers" disabled={selections.size !== quiz.questions?.length} />
+            <p className="answers">
+                2 / 5 participants have answered.
+            </p>
+            <input className="end" type="button" value="Close quiz" />
+            <p className="end">
+                This quiz will expire in 30 days.
+            </p>
+            <input className="delete" type="button" value="Delete it now" />
+        </form>
     )
 }

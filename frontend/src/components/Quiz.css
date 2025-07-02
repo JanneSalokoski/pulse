@@ -46,3 +46,59 @@
         background-color: #444499;
     }
 }
+
+.Quiz {
+    display: flex;
+    flex-direction: column;
+
+    gap: var(--gap);
+
+    justify-content: center;
+    align-content: flex-start;
+
+    h2,
+    h3,
+    p {
+        text-align: center;
+    }
+
+    input[type="button"],
+    input[type="submit"] {
+        width: 15rem;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+}
+
+.questions {
+    display: flex;
+    flex-direction: column;
+
+    gap: calc(2*var(--gap));
+
+    margin-top: calc(4*var(--gap));
+    margin-bottom: calc(2*var(--gap));
+}
+
+.Question {
+    .text {
+        text-align: center;
+        display: block;
+        margin-bottom: var(--gap);
+    }
+}
+
+.answers {
+    margin-top: calc(4*var(--gap));
+}
+
+input.end {
+    margin-bottom: calc(2*var(--gap));
+}
+
+input.delete {
+    background-color: #551111;
+    border: 1px solid #773333;
+    color: #ffaaaa;
+}
