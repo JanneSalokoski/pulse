@@ -9,6 +9,9 @@ export const getAnswers = () =>
 export const getAnswer = (id: number) =>
     api.get<Answer>(`answers/${id}`).then((res) => res.data)
 
-export const createQuiz = (answer: CreateAnswer) =>
+export const createAnswer = (answer: CreateAnswer) =>
     api.post<Answer, AxiosResponse<Answer>, Answer>('answers/', answer).then((res) => res.data)
+
+export const createAnswerBatch = (answers: CreateAnswer[]) =>
+    api.post<CreateAnswer[], AxiosResponse<CreateAnswer[]>, CreateAnswer[]>('answers/batch', answers).then((res) => res.data)
 

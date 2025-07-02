@@ -72,6 +72,24 @@ async def create_answer(answer: AnswerCreate, session: SessionDep):
     return db_answer
 
 
+@router.post("/batch", response_model=list[AnswerPublic])
+async def create_answers(answers: list[AnswerCreate], session: SessionDep):
+    db_answers = [
+        Answer(
+            id=None, value=ans.value, quiz_id=ans.quiz_id, question_id=ans.question_id
+        )
+        for ans in answers
+    ]
+
+    session.add_all(db_answers)
+    session.commit()
+
+    for ans in db_answers:
+        session.refresh(ans)
+
+    return db_answers
+
+
 @router.patch("/{id}", response_model=AnswerPublic)
 def update_answer(id: int, answer: AnswerUpdate, session: SessionDep):
     answer_db: Answer | None = session.get(Answer, id)
