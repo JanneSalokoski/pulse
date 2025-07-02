@@ -25,6 +25,7 @@ export interface Group {
 }
 
 export interface Quiz {
+    id: number;
     name: string;
     slug: string;
     created_at: string;
