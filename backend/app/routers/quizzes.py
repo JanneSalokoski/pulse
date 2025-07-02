@@ -1,9 +1,11 @@
 import hashlib
 from typing import TYPE_CHECKING
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
 from sqlmodel import Field, Relationship, SQLModel, select
 from datetime import datetime
+
+from collections import defaultdict
 
 from ..dependencies import SessionDep
 
@@ -49,6 +51,40 @@ class QuizCreate(QuizBase):
 
 
 router = APIRouter(prefix="/quizzes", tags=["quizzes"])
+
+connections: dict[str, set[WebSocket]] = defaultdict(set)
+
+
+@router.websocket("/ws/{slug}")
+async def ws_visitor_counter(ws: WebSocket, slug: str):
+    await ws.accept()
+    connections[slug].add(ws)
+
+    await broadcast_count(slug)
+
+    try:
+        while True:
+            _ = await ws.receive_text()
+
+    except WebSocketDisconnect:
+        connections[slug].remove(ws)
+        await broadcast_count(slug)
+
+
+async def broadcast_count(slug: str):
+    conns: set[WebSocket] = connections[slug]
+    count = len(conns)
+    msg = str(count)
+
+    dead: list[WebSocket] = []
+    for ws in conns:
+        try:
+            await ws.send_text(msg)
+        except Exception:
+            dead.append(ws)
+
+    for ws in dead:
+        conns.remove(ws)
 
 
 @router.get("", response_model=list[QuizPublic])
