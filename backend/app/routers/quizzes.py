@@ -32,6 +32,7 @@ class Quiz(QuizBase, table=True):
 
 
 class QuizPublic(QuizBase):
+    id: int
     name: str
     slug: str
     created_at: str
