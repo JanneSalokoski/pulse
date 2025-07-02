@@ -48,9 +48,10 @@ function QuestionItem({ question, selected, handleSelect }: QuestionProps) {
 
 interface QuizProps {
     quiz: Quiz
+    visitors: number
 }
 
-export function QuizItem({ quiz }: QuizProps) {
+export function QuizItem({ quiz, visitors }: QuizProps) {
     const [selections, setSelections] = useState<Map<number, number>>(() => new Map());
 
     function handleSelection(question_id: number, value: number) {
@@ -63,11 +64,12 @@ export function QuizItem({ quiz }: QuizProps) {
         event.preventDefault();
     }
 
+
     return (
         <form className="Quiz" onSubmit={handleSubmit}>
             <a href={`/q/${quiz.slug}`}><h3>{`/q/${quiz.slug}`}</h3></a>
             <p className="participants">
-                <span>There are 5 participants here.</span>
+                <span>There are {visitors} participants here.</span>
             </p>
             <div className="questions">
                 <h3>Questions:</h3>
