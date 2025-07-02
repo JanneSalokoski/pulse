@@ -1,7 +1,8 @@
-import type { Question, Quiz } from "@api/types"
+import type { CreateAnswer, Question, Quiz } from "@api/types"
 
 import "./Quiz.css";
 import { useState } from "react";
+import { createAnswerBatch } from "@api/answers";
 
 interface RangeInputProps {
     value: number | undefined;
@@ -62,6 +63,11 @@ export function QuizItem({ quiz, visitors }: QuizProps) {
 
     function handleSubmit(event: React.FormEvent) {
         event.preventDefault();
+        let objs: CreateAnswer[] = Array.from(selections.entries()).map(([key, value]) => ({
+            value: value, question_id: key, quiz_id: quiz.id
+        }));
+
+        createAnswerBatch(objs);
     }
 
 
