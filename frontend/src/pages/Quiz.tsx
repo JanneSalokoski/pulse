@@ -1,6 +1,7 @@
 import { getQuiz } from "@api/quizzes";
-import type { Quiz, Question } from "@api/types";
+import type { Quiz } from "@api/types";
 import { Header } from "@components/Header";
+import { QuizItem } from "@components/Quiz";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -18,13 +19,9 @@ export function QuizPage() {
     return (
         <div className="Quiz Page">
             <Header pageTitle={quiz?.name || ""} />
-            <ul>
-                {
-                    quiz?.questions?.map((q: Question) => (
-                        <li key={q.id}>{q.text}</li>
-                    ))
-                }
-            </ul>
+            {
+                quiz ? <QuizItem quiz={quiz} /> : <></>
+            }
         </div>
     )
 }
