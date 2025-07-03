@@ -2,7 +2,11 @@ from typing import TYPE_CHECKING
 from fastapi import APIRouter, HTTPException
 from sqlmodel import Field, Relationship, SQLModel, select
 
+from app.websocket.manager import broadcast_answers
+
 from ..dependencies import SessionDep
+
+# from .quizzes import Quiz
 
 if TYPE_CHECKING:
     from .quizzes import Quiz
@@ -86,6 +90,14 @@ async def create_answers(answers: list[AnswerCreate], session: SessionDep):
 
     for ans in db_answers:
         session.refresh(ans)
+
+    if db_answers:
+        from .quizzes import Quiz
+
+        quiz_id = db_answers[0].quiz_id
+        quiz: Quiz | None = session.get(Quiz, quiz_id)
+        if quiz:
+            await broadcast_answers(quiz.slug, len(db_answers))
 
     return db_answers
 

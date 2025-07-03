@@ -1,4 +1,5 @@
 import hashlib
+import traceback
 from typing import TYPE_CHECKING
 
 from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
@@ -8,6 +9,7 @@ from datetime import datetime
 from collections import defaultdict
 
 from ..dependencies import SessionDep
+from ..websocket.manager import connect, disconnect
 
 from .questions import Question, QuestionWithAnswers
 from .quiz_question_link import QuizQuestionLink
@@ -57,34 +59,22 @@ connections: dict[str, set[WebSocket]] = defaultdict(set)
 
 @router.websocket("/ws/{slug}")
 async def ws_visitor_counter(ws: WebSocket, slug: str):
-    await ws.accept()
-    connections[slug].add(ws)
-
-    await broadcast_count(slug)
-
     try:
+        await connect(slug, ws)
+
+        await ws.send_json({"event": "connected", "payload": {"message": "Welcome"}})
+
         while True:
             _ = await ws.receive_text()
 
     except WebSocketDisconnect:
-        connections[slug].remove(ws)
-        await broadcast_count(slug)
+        await disconnect(slug, ws)
+        print("WebSocket disconnected cleanly")
 
-
-async def broadcast_count(slug: str):
-    conns: set[WebSocket] = connections[slug]
-    count = len(conns)
-    msg = str(count)
-
-    dead: list[WebSocket] = []
-    for ws in conns:
-        try:
-            await ws.send_text(msg)
-        except Exception:
-            dead.append(ws)
-
-    for ws in dead:
-        conns.remove(ws)
+    except Exception as e:
+        print("Unhandled WebSocket error:")
+        traceback.print_exc()
+        await disconnect(slug, ws)
 
 
 @router.get("", response_model=list[QuizPublic])
